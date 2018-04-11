@@ -1,30 +1,48 @@
-#include <stdio.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <errno.h>
+    #include <stdio.h>
+    #include <dirent.h>
+    #include <string.h>
+    #include <sys/stat.h>
+    #include <sys/types.h>
+    #include <errno.h>
+    #include <unistd.h>
 
-int main(int argc, char** argv)
-{
-   DIR *dirPtr;
-   struct dirent *entryPtr;
-   struct stat statBuf;
+    int main(int argc, char** argv)
+    {
+    if (argc != 3)
+    {
+        printf("Provide an argument and directory path.\n");
+        return 1;
+    }
 
-   char* command = argv[1];
-   char* directory = argv[2];
+    DIR *dirPtr;
+    struct dirent *entryPtr;
+    struct stat statBuf;
 
-   dirPtr = opendir (directory);
+    char* command = argv[1];
+    char* directory = argv[2];
 
-   while ((entryPtr = readdir (dirPtr))){
-      printf ("%-20s", entryPtr->d_name);
-      stat(entryPtr->d_name, &statBuf);
-      if(strcmp(command, "-i")==0){
-         printf("\tInode: %d\n", statBuf.st_ino);
-      }else if(strcmp(command, "-n")==0){
-         printf("\tUser: %d\t Group: %d\n", statBuf.st_uid, statBuf.st_gid);
-      }
-   }
+    chdir(directory);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    printf("%s\n", cwd);
 
-   closedir (dirPtr);
-   return 0;
-}
+    dirPtr = opendir (directory);
+
+    while ((entryPtr = readdir (dirPtr)))
+    {
+        printf ("%-20s", entryPtr->d_name);
+        stat(entryPtr->d_name, &statBuf);
+
+        if(strcmp(command, "-i") == 0)
+        {
+            printf("\tInode: %lld\n", statBuf.st_ino);
+        }
+        else if(strcmp(command, "-n") == 0)
+        {
+            printf("\tUser: %d\t Group: %d\n", statBuf.st_uid, statBuf.st_gid);
+        }
+    }
+
+    closedir (dirPtr);
+    return 0;
+    }
