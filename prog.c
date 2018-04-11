@@ -29,6 +29,14 @@ int main(int argc, char **argv)
 
     while ((entryPtr = readdir(dirPtr)))
     {
+        char tmp[2];
+        memcpy(tmp, entryPtr->d_name, 1);
+
+        if (strcmp(tmp, ".") == 0)
+        {
+            continue;
+        }
+
         printf("%-20s", entryPtr->d_name);
         stat(entryPtr->d_name, &statBuf);
 
